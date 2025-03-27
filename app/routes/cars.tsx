@@ -7,11 +7,25 @@ export async function loader() {
       brand: true,
     },
   });
-  return { cars };
+
+  // Convert Decimal to number before sending to client
+  const carsWithNumberPrice = cars.map((car) => ({
+    ...car,
+    price: Number(car.price),
+  }));
+
+  return { cars: carsWithNumberPrice };
 }
 
 export default function CarsRoute() {
   const { cars } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Cars</h1>
@@ -52,7 +66,7 @@ export default function CarsRoute() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    ${car.price.toLocaleString()}
+                    {currencyFormatter.format(car.price)}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
